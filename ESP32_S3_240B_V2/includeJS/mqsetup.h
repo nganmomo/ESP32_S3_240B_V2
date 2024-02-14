@@ -1,0 +1,165 @@
+static const char PROGMEM INDEX_HTML_mqsetup[] = R"rawliteral(
+<html>
+<body><div id=ssetup></div></body>
+</html>  
+<script>
+// For mqtt
+let xsetdev=4;
+let ysetdev=6;
+var txdata;
+//for htmltestpage.html
+var rowtext = Array.from(Array(xsetdev), () => new Array(ysetdev)); 
+var systcell = Array.from(Array(xsetdev), () => new Array(ysetdev).fill("")); 
+
+function sysloadinitdata(){      
+console.log('cd0',systcell);   
+  //localStorage.clear(); //all items
+  //localStorage.removeItem('systcell');
+  var np = ['SERVER','LocalTopic','TOPIC A','TOPIC B','TOPIC C','TOPIC D'];
+  var pp = ['PORT','Num','Num','Num','Num','Num'];
+  var dp1 = ['USER','Qos','Qos','Qos','Qos','Qos'];
+  var dp2 = ['PASSWORD','Refresh(Sec)','Refresh(Sec)','Refresh(Sec)','Refresh(Sec)','Refresh(Sec)'];  
+  for(let t=0;t<ysetdev;t++)                                       
+      {if(t===0)  
+        {rowtext[0][t] = "<td>"+np[t]+":<input type='text' maxlength='120' value='"+systcell[0][t]+"'onchange=updatetcell(0,"+t+",value) style='width:180px'></td>"                
+        rowtext[1][t] = "<td>"+pp[t]+":<input type='text' maxlength='4' value='"+systcell[1][t]+"'onchange=updatetcell(1,"+t+",value)\
+        style='width:54px'></td>"   
+        rowtext[2][t] = "<td>"+dp1[t]+":<input type='text' maxlength='20' value='"+systcell[2][t]+"'onchange=updatetcell(2,"+t+",value)\
+        style='width:100px'></select></td>"             
+        rowtext[3][t] = "<td>"+dp2[t]+"<input type='text' maxlength='20' value='"+systcell[3][t]+"'onchange=updatetcell(3,"+t+",value)\
+        style='width:100px'></select></td>"    
+        }                      
+      if(t>0)
+        {rowtext[0][t] = "<td>"+np[t]+":<input type='text' maxlength='20' value='"+systcell[0][t]+"'onchange=updatetcell(0,"+t+",value)\
+        style='width:160px'></td>"
+        rowtext[1][t] = "<td>"+pp[t]+":<input type='text' maxlength='2' value='"+systcell[1][t]+"'onchange=updatetcell(1,"+t+",value)\
+        style='width:60px'></td>"   
+        rowtext[2][t] = "<td>"+dp1[t]+":<input type='text' maxlength='2' value='"+systcell[2][t]+"'onchange=updatetcell(2,"+t+",value)\
+        style='width:100px'></select></td>"             
+        rowtext[3][t] = "<td>"+dp2[t]+"<input type='text' maxlength='2' value='"+systcell[3][t]+"'onchange=updatetcell(3,"+t+",value)\
+        style='width:100px'></select></td>"             
+        }   
+      }                  
+  for(let j=0;j<ysetdev;j++)  
+      {row = document.getElementById('myDRow'+j.toString());         
+      x0 = row.insertCell(0);  //insert
+      x1 = row.insertCell(1); 
+      x2 = row.insertCell(2); 
+      x3 = row.insertCell(3);        
+      x0.innerHTML = rowtext[0][j];  //
+      x1.innerHTML = rowtext[1][j];  //   
+      x2.innerHTML = rowtext[2][j];  //
+      x3.innerHTML = rowtext[3][j];  //      
+      }                
+   }     
+
+function updatetcell(x,y,value)
+{systcell[x][y]=value;
+localStorage.setItem('systcell',JSON.stringify(systcell));
+}
+
+function UploadsetupMqsu()
+{ 
+  Uploadsetup('MQSU');
+}
+
+
+function Uploadsetup(txdata)  //txdata= "MQSD"
+{//MQSU MQSD   
+var xhtp = new XMLHttpRequest(); 
+  xhtp.onreadystatechange = function() {
+  txre="";  
+  tyre="";
+  if(this.readyState == 4 && this.status == 200) {      
+      txre=this.responseText[0]+this.responseText[1]+this.responseText[2]+this.responseText[3];                                       
+      tyre=this.responseText;
+      if(txre==="mQsD")   //mQsU is uplad     
+        {console.log('mqs upload ok',this.responseText);
+        let x=0;let y=0;
+        for(var t=4;t<500;t++)
+          {if(tyre[t]==='%') //&& tyre[t+1]=='%')
+            {if(x++>=3)   //5
+              {x=0;y++;
+              if(y>=ysetdev)  break; //y=0;              
+              }
+            //t++;  
+            }
+          else                
+            systcell[x][y]=systcell[x][y]+tyre[t];                        
+          }   
+        Loaddetable();   
+        }
+    }         
+  }  
+  if(txdata==="MQSU")
+  {for(var y=0;y<ysetdev;y++)
+    {for(var x=0;x<xsetdev;x++)
+      txdata=txdata+systcell[x][y]+'%';   //^%";    
+    } 
+  }  
+  console.log("txdata=",txdata);  
+  xhtp.open("GET","http://"+URL+"/action?go=" + txdata, true);     
+  xhtp.send();  
+}
+
+function Loaddefault()      
+{
+systcell[0][0]='192.168.1.186';                       //ste=localStorage.getItem('myurl'); 
+systcell[1][0]='1883';  
+systcell[2][0]='myid'; 
+systcell[3][0]='mypassword';   
+
+systcell[0][1]="myTopic4";
+systcell[1][1]='0';  
+systcell[2][1]='0'; 
+systcell[3][1]='-';  
+
+for(var t=2;t<ysetdev;t++)  
+  {
+  systcell[0][t]="myTopic"+(t-1); 
+  systcell[1][t]='0';  
+  systcell[2][t]='0'; 
+  systcell[3][t]='1';    
+  }
+}
+
+function Loaddefaulttable()
+{Loaddefault();
+Loaddetable()
+}
+
+function Loaddetable(){
+localStorage.setItem('systcell',JSON.stringify(systcell));
+for(let y=0;y<ysetdev;y++)  
+  {var row = document.getElementById('myDRow'+y.toString());      
+    {for(let j=0;j<xsetdev;j++)          
+      row.deleteCell(0);         
+    }   
+  }    
+sysloadinitdata();
+}
+
+syssetup=
+"<table class='devtable'>\
+<tbody>\
+<tr id='myDRow0'></tr><tr id='myDRow1'></tr><tr id='myDRow2'>\
+</tr><tr id='myDRow3'></tr><tr id='myDRow4'></tr><tr id='myDRow5'></tr>\
+</tbody>\
+</table>\
+<br>\
+<button type='button' onclick='UploadsetupMqsu()'>Upload setup</button>\
+<button type='button' onclick='Loaddefaulttable()'>Load default</button><br>\
+<style>input{\
+  background: rgb(161, 154, 154);\
+  text-align: center;}\
+</style>"
+//<div id='hbar' class='hbar'><img src='http://ipcworld.online/image/MqttExample.png' width='800px' height='300px'/></div>
+
+window.onload = async function(){
+  URL=localStorage.getItem('localurl');
+  document.getElementById('ssetup').innerHTML=syssetup;
+  sysloadinitdata();
+  Uploadsetup("MQSD");
+}
+</script>
+)rawliteral";

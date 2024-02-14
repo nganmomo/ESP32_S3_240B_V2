@@ -1,0 +1,35 @@
+not for esp32 s3 
+file in 'esp32_s3_hscale_train'
+For program upload, only connect usb to uart
+Debug easy. jsut connect both usb connector.
+
+MQTT only work at 50 44 45 type
+board as master
+reset eeprom switch
+LED = MQTT connected
+LED = WIFI connected
+LED = run mode
+LED = Cool boot/ io pin to reset
+ADDRESS URL 
+
+if ladder program fault, can not restart; switch for reboot is required.
+reset all switch
+check MQTT position before load icon
+disable all network
+
+fix clear all memory in pc
+
+let ste=window.location.hostname;
+plcsvgut.js different 
+add css
+Serial.println (WiFi.localIP ())
+
+About update 
+//ESP32_S3_240B_V2
+"Home.h" for web support   (1)
+"staticpromipcw.h" for two Chips (2)
+//PLCSVG240B_V2             
+"Home.h" for web simulate   (4)
+//PLC_Combine
+"Home.h" for web support    (1)
+"plclocal.h" for no web support (3)
